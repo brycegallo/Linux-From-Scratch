@@ -1,4 +1,5 @@
 Using Ubuntu 22.04.3 for Arm64 in Parallels on an M2 Macbook Air
+Last Updated: 2023-December-05
 
 # Preparing the Linux Environment
 
@@ -257,4 +258,83 @@ cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
 Again clean up after the make and install
 ```
 rm -r gcc-13.2.0
+```
+
+### Linux 6.5.1 kernel
+```
+tar -xvf linux-6.5.1.tar.xz
+cd linux-6.5.1
+```
+Expose an Application Programming Interface (API) for the system's C library (Glibc in LFS) to use
+```
+make mrproper
+```
+
+Extract the user-visible kernel headers from the source
+```
+make headers
+find usr/include -type f ! -name '*.h' -delete
+cp -rv usr/include $LFS/usr
+```
+
+Clean up
+```
+rm -R linux-6.5.1
+```
+
+### Glibc
+Extract the tar file, cd into the directory created in extraction, apply the patch, make a build directory, cd into it
+```
+tar -xvf glibc-2.38.tar.xz
+cd glibc-2.38
+patch -Np1 -i ../glibc-2.38-fhs-1.patch
+mkdir -v build
+cd build
+```
+Ensure that the ldconfig and sln utilities are installed into /usr/sbin:
+```
+echo "rootsbindir=/usr/sbin" > configparms
+```
+
+Configure the makefile
+```
+../configure                             \
+      --prefix=/usr                      \
+      --host=$LFS_TGT                    \
+      --build=$(../scripts/config.guess) \
+      --enable-kernel=4.14               \
+      --with-headers=$LFS/usr/include    \
+      libc_cv_slibdir=/usr/lib
+```
+
+There are some reports that this package fails when using ```make``` with multiple cores, so either use one core to be safe, or use multiple cores as normal and rerun the file with just one core if it fails
+```
+time make -j1
+```
+
+Install the newly built Glibc to the LFS system.
+Ensure that ```$LFS``` is set to ```/mnt/lfs``` or the following command might render your current Linux system unusable
+```
+make DESTDIR=$LFS install
+```
+
+Fix a hard coded path to the executable loader in the ldd script
+```
+sed '/RTLDLIST=/s@/usr@@g' -i $LFS/usr/bin/ldd
+```
+
+Now check to make sure the following commands produce the accompanying output
+```
+echo 'int main(){}' | $LFS_TGT-gcc -xc -
+readelf -l a.out | grep ld-linux
+```
+Output:
+```
+[Requesting program interpreter: /lib/ld-linux-aarch64.so.1]
+```
+Then clean up the test file and sources directory
+```
+rm -v a.out
+cd ../..
+rm -R glibc-2.38
 ```
