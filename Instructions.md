@@ -8,7 +8,7 @@ sudo -i
 
 use bash instead of dash
 ```
-dpkg-reconfigure das
+dpkg-reconfigure dash
 no
 ```
 
