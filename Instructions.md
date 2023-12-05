@@ -188,7 +188,7 @@ make -k check
 Then to help prevent conflicts in future builds, in cases where the same software will be built more than once, return to the sources folder and remove the directory, confirming the removal of any files if the shell prompts.
 ```
 cd $LFS/sources/
-rm -R binutils-2.41
+rm -r binutils-2.41
 ```
 
 
@@ -280,7 +280,7 @@ cp -rv usr/include $LFS/usr
 
 Clean up
 ```
-rm -R linux-6.5.1
+rm -r linux-6.5.1
 ```
 
 ### Glibc
@@ -337,7 +337,7 @@ Then clean up the test file and sources directory
 ```
 rm -v a.out
 cd ../..
-rm -R glibc-2.38
+rm -r glibc-2.38
 ```
 
 ### Libstdc++ from GCC-13.2.0 
@@ -378,7 +378,93 @@ rm -v $LFS/usr/lib/lib{stdc++,stdc++fs,supc++}.la
 Clean up
 ```
 cd ../..
-rm -R gcc-13.2.0
+rm -r gcc-13.2.0
 ```
 
 # Cross Compiling Temporary Tools
+
+### m4-1.4.19
+
+Extract the tar file, cd into the directory created in extraction
+```
+tar -xvf m4-1.4.19.tar.xz
+cd m4-1.4.19
+```
+
+Configure the makefile
+```
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+```
+
+Compile Libstdc++ and time the operation
+```
+time make
+```
+
+Install the library
+```
+make DESTDIR=$LFS install
+```
+
+Leave directory and clean up
+```
+cd ..
+rm -r m4-1.4.19
+```
+
+### Ncurses-6.4
+Extract the tar file, cd into the directory created in extraction
+```
+tar -xvf ncurses-6.4.tar.xz
+cd ncurses-6.4
+```
+
+First, ensure that gawk is found first during configuration:
+```
+sed -i s/mawk// configure
+```
+
+Build the “tic” program on the build host:
+```
+mkdir build
+pushd build
+  ../configure
+  make -C include
+  make -C progs tic
+popd
+```
+
+Configure the makefile
+```
+./configure --prefix=/usr                \
+            --host=$LFS_TGT              \
+            --build=$(./config.guess)    \
+            --mandir=/usr/share/man      \
+            --with-manpage-format=normal \
+            --with-shared                \
+            --without-normal             \
+            --with-cxx-shared            \
+            --without-debug              \
+            --without-ada                \
+            --disable-stripping          \
+            --enable-widec
+```
+
+Compile Ncurses-6.4 and time the operation
+```
+time make
+```
+
+Install the package:
+```
+make DESTDIR=$LFS TIC_PATH=$(pwd)/build/progs/tic install
+echo "INPUT(-lncursesw)" > $LFS/usr/lib/libncurses.so
+```
+
+Clean up
+```
+cd ..
+rm -r ncurses-6.4
+```
