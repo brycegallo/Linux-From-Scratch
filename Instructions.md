@@ -120,7 +120,8 @@ exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
 EOF
 ```
 
-create a bashrc file to define the settings for new bash shell instances
+Create a bashrc file to define the settings for new bash shell instances.
+MAKEFLAGS can be changed to reflect the number of cores available on the host system, the default here is 4
 ```
 cat > ~/.bashrc << "EOF"
 set +h
@@ -165,7 +166,7 @@ mkdir -v build
 cd build
 ```
 
-Use the following command to configure binutils for build and installation
+Use the following command to configure a binutils makefile for build and installation
 ```
 ../configure --prefix=$LFS/tools \
              --with-sysroot=$LFS \
@@ -186,4 +187,74 @@ Then to help prevent conflicts in future builds, in cases where the same softwar
 ```
 cd $LFS/sources/
 rm -R binutils-2.41
+```
+
+
+### GNU Compiler Collection
+```
+tar -xvf gcc-13.2.0.tar.xz
+cd gcc-13.2.0
+```
+
+Unpack and rename GCC's MPFR, GMP, and MPC packages so the GCC build process will use them automatically
+```
+tar -xf ../mpfr-4.2.1.tar.xz
+mv -v mpfr-4.2.1 mpfr
+tar -xf ../gmp-6.3.0.tar.xz
+mv -v gmp-6.3.0 gmp
+tar -xf ../mpc-1.3.1.tar.gz
+mv -v mpc-1.3.1 mpc
+```
+
+This LFS build is being made on an ARM64 host, so the following command sets the default directory name for 64-bit libraries to ```lib```
+```
+sed -e '/lp64=/s/lib64/lib/' \
+    -i.orig gcc/config/aarch64/t-aarch64-linux
+```
+
+Following the same instruction as for binutils regarding building to a specific ```build``` directory
+```
+mkdir -v build
+cd build
+```
+
+GCC makefile configuration command
+```
+../configure                  \
+    --target=$LFS_TGT         \
+    --prefix=$LFS/tools       \
+    --with-glibc-version=2.38 \
+    --with-sysroot=$LFS       \
+    --with-newlib             \
+    --without-headers         \
+    --enable-default-pie      \
+    --enable-default-ssp      \
+    --disable-nls             \
+    --disable-shared          \
+    --disable-multilib        \
+    --disable-threads         \
+    --disable-libatomic       \
+    --disable-libgomp         \
+    --disable-libquadmath     \
+    --disable-libssp          \
+    --disable-libvtv          \
+    --disable-libstdcxx       \
+    --enable-languages=c,c++
+```
+
+Make and install
+```
+time { make && make install; }
+```
+
+Create a full internal system header which will be needed for later builds
+```
+cd ..
+cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include/limits.h
+```
+
+Again clean up after the make and install
+```
+rm -r gcc-13.2.0
 ```
