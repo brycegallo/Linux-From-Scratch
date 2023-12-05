@@ -1,5 +1,7 @@
 Using Ubuntu 22.04.3 for Arm64 in Parallels on an M2 Macbook Air
 
+# Preparing the Linux Environment
+
 Enter the terminal and use the following commands:
 Enter root
 ```
@@ -18,10 +20,12 @@ sudo add-apt-repository universe
 sudo add-apt-repository multiverse
 sudo apt update
 ```
+
 use  [2.2-bash-script](https://github.com/brycegallo/Linux-From-Scratch/blob/main/2.2-bash-script) to check software requirements
 ```
 bash /home/parallels/Documents/2.2-bash-script
 ```
+
 With around 40-50GB of free space on a drive, use GParted to create three partitions as follows:
 1. 512mb ext2 - "boot"
 2. ~40,000 ext4 - "rootfs"
@@ -39,7 +43,7 @@ Check this is set by echoing its value
 echo $LFS
 ```
 
-Create and Mount the 
+Create and Mount the lfs directory
 ```
 mkdir -pv $LFS
 mount -v -t ext4 /dev/sda4 $LFS
@@ -66,6 +70,7 @@ To get all the necessary packages for this build we can use wget with the follow
 wget https://www.linuxfromscratch.org/~xry111/lfs/view/arm64/wget-list-sysv
 wget --input-file=wget-list-sysv --continue --directory-prefix=$LFS/sources
 ```
+
 To verify that everything has been downloaded, run the following commands
 ```
 wget https://www.linuxfromscratch.org/~xry111/lfs/view/arm64/md5sums
@@ -74,6 +79,7 @@ pushd $LFS/sources
   md5sum -c md5sums
 popd
 ```
+
 Any missing packages or patches can be downloaded separately and moved to ```/mnt/lfs/sources```. Some may be present and mistakenly missing from the previous check. A more manual check can be done by going to the sources directory and using ```ls -la``` to view all present packages and patches.
 
 Next, create a limited directory hierarchy with the following commands, ensuring that they are being run as root
@@ -84,6 +90,7 @@ for i in bin lib sbin; do
   ln -sv usr/$i $LFS/$i
 done
 ```
+
 Programs appearing later in this process will be cross compiled using a compiler placed in its own directory, which will be made with the following command
 ```
 mkdir -pv $LFS/tools
@@ -94,4 +101,89 @@ Create a new non-root user to allow more leniency in case any mistakes are made 
 groupadd lfs
 useradd -s /bin/bash -g lfs -m -k /dev/null lfs
 passwd lfs
+```
+
+Make lfs the owner of all directories under /mnt/lfs so it has full access to them
+```
+chown -v lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools}
+```
+
+Then either start a new shell as user lfs or use the following command to switch to lfs in the current shell
+```
+su - lfs
+```
+
+Create a new bash profile with the following command
+```
+cat > ~/.bash_profile << "EOF"
+exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
+EOF
+```
+
+create a bashrc file to define the settings for new bash shell instances
+```
+cat > ~/.bashrc << "EOF"
+set +h
+umask 022
+LFS=/mnt/lfs
+LC_ALL=POSIX
+LFS_TGT=$(uname -m)-lfs-linux-gnu
+PATH=/usr/bin
+if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
+PATH=$LFS/tools/bin:$PATH
+CONFIG_SITE=$LFS/usr/share/config.site
+export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
+export LFS=/mnt/lfs
+export MAKEFLAGS='-j4'
+EOF
+```
+
+Remove any undocumented instantations of .bashrc that might be included with some Linux distributions and potentially cause conflicts when building critical packages
+```
+[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
+```
+
+Force the bash shell to read this newly created profile
+```
+source ~/.bash_profile
+```
+
+# Building Software from Source
+Ensure all packages and patches are in the directory ```/mnt/lfs/sources/```
+1. Use ```tar``` to extract each one
+2. ```cd``` to the newly created directory after extraction
+3. Follow the specific instructions for each package.
+4. ```cd``` back to the sources directory after building
+5. Delete the original, un-extracted file unless instructed otherwise
+
+### GNU Binutils
+Extract the tar file and then work inside the directories as instructed
+```
+tar -xvf binutils-2.41.tar.xz
+cd binutils-2.41
+mkdir -v build
+cd build
+```
+
+Use the following command to configure binutils for build and installation
+```
+../configure --prefix=$LFS/tools \
+             --with-sysroot=$LFS \
+             --target=$LFS_TGT   \
+             --disable-nls       \
+             --enable-gprofng=no \
+             --disable-werror
+```
+Then build and install with the following command, which is wrapped in ```time { } ``` to provide a baseline estimate of how long each build and install should take. This is not necessary but provides us a "Standard Build Unit" (SBU) of time, which LFS has provided for each build.
+```
+time { make && make install; }
+```
+After building, optionally check the output of the make process.
+```
+make -k check
+```
+Then to help prevent conflicts in future builds, in cases where the same software will be built more than once, return to the sources folder and remove the directory, confirming the removal of any files if the shell prompts.
+```
+cd $LFS/sources/
+rm -R binutils-2.41
 ```
