@@ -468,3 +468,39 @@ Clean up
 cd ..
 rm -r ncurses-6.4
 ```
+
+### Bash-5.2.15
+Extract the tar file, cd into the directory created in extraction
+```
+tar -xvf bash-5.2.15.tar.gz
+cd bash-5.2.15
+```
+
+Configure the makefile
+```
+./configure --prefix=/usr                      \
+            --build=$(sh support/config.guess) \
+            --host=$LFS_TGT                    \
+            --without-bash-malloc
+```
+
+Compile Bash-5.2.15 and time the operation
+```
+time make
+```
+
+Install the package
+```
+make DESTDIR=$LFS install
+```
+
+Make a link for the programs that use sh for a shell:
+```
+ln -sv bash $LFS/bin/sh
+```
+
+Clean up
+```
+cd ..
+rm -r bash-5.2.15
+```
