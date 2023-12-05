@@ -88,3 +88,10 @@ Programs appearing later in this process will be cross compiled using a compiler
 ```
 mkdir -pv $LFS/tools
 ```
+
+Create a new non-root user to allow more leniency in case any mistakes are made in the next steps.
+```
+groupadd lfs
+useradd -s /bin/bash -g lfs -m -k /dev/null lfs
+passwd lfs
+```
