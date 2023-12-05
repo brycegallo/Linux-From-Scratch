@@ -150,7 +150,8 @@ Force the bash shell to read this newly created profile
 source ~/.bash_profile
 ```
 
-# Building Software from Source
+# Compiling a Cross-Toolchain
+## Building Software from Source
 Ensure all packages and patches are in the directory ```/mnt/lfs/sources/```
 1. Use ```tar``` to extract each one
 2. ```cd``` to the newly created directory after extraction
@@ -338,3 +339,46 @@ rm -v a.out
 cd ../..
 rm -R glibc-2.38
 ```
+
+### Libstdc++ from GCC-13.2.0 
+Extract the tar file, cd into the directory created in extraction, make a build directory, cd into it
+```
+tar -xvf gcc-13.2.0.tar.xz
+mkdir -v build
+cd build
+```
+
+Configure the makefile
+```
+../libstdc++-v3/configure           \
+    --host=$LFS_TGT                 \
+    --build=$(../config.guess)      \
+    --prefix=/usr                   \
+    --disable-multilib              \
+    --disable-nls                   \
+    --disable-libstdcxx-pch         \
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/13.2.0
+```
+
+Compile Libstdc++ and time the operation
+```
+time make
+```
+
+Install the library
+```
+make DESTDIR=$LFS install
+```
+
+Remove the libtool archive files because they are harmful for cross-compilation:
+```
+rm -v $LFS/usr/lib/lib{stdc++,stdc++fs,supc++}.la
+```
+
+Clean up
+```
+cd ../..
+rm -R gcc-13.2.0
+```
+
+# Cross Compiling Temporary Tools
