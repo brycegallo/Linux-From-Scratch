@@ -39,6 +39,38 @@ Check this is set by echoing its value
 echo $LFS
 ```
 
+Create and Mount the 
 ```
 mkdir -pv $LFS
+mount -v -t ext4 /dev/sda4 $LFS
+```
+Check that this is mounted properly
+```
+lsblk
+```
+
+Ensure that the swap partition is enabled
+```
+cd $LFS
+/sbin/swapon -v /dev/sda5
+```
+
+Prepare a directory all the packages to be stored for this build, then change its permissions so that it can be written to by anyone but only the owner can delete from it
+```
+mkdir -v $LFS/sources
+chmod -v a+wt $LFS/sources
+```
+
+To get all the necessary packages for this build we can use wget with the following commands to download them
+```
+wget https://www.linuxfromscratch.org/~xry111/lfs/view/arm64/wget-list-sysv
+wget --input-file=wget-list-sysv --continue --directory-prefix=$LFS/sources
+```
+To verify that everything has been downloaded, run the following commands
+```
+wget https://www.linuxfromscratch.org/~xry111/lfs/view/arm64/md5sums
+
+pushd $LFS/sources
+  md5sum -c md5sums
+popd
 ```
