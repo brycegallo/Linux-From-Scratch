@@ -74,3 +74,17 @@ pushd $LFS/sources
   md5sum -c md5sums
 popd
 ```
+Any missing packages or patches can be downloaded separately and moved to ```/mnt/lfs/sources```. Some may be present and mistakenly missing from the previous check. A more manual check can be done by going to the sources directory and using ```ls -la``` to view all present packages and patches.
+
+Next, create a limited directory hierarchy with the following commands, ensuring that they are being run as root
+```
+mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
+
+for i in bin lib sbin; do
+  ln -sv usr/$i $LFS/$i
+done
+```
+Programs appearing later in this process will be cross compiled using a compiler placed in its own directory, which will be made with the following command
+```
+mkdir -pv $LFS/tools
+```
