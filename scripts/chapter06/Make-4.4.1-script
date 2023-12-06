@@ -1,0 +1,22 @@
+#!/bin/bash
+# Make-4.4.1
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf make-4.4.1.tar.gz
+cd make-4.4.1
+
+# Configure the makefile
+./configure --prefix=/usr   \
+            --without-guile \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+# Compile Make-4.4.1 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r make-4.4.1
