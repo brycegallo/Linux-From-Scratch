@@ -1,0 +1,26 @@
+#!/bin/bash
+# Xz-5.4.4
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf xz-5.4.4.tar.xz 
+cd xz-5.4.4
+
+# Configure the makefile
+./configure --prefix=/usr                     \
+            --host=$LFS_TGT                   \
+            --build=$(build-aux/config.guess) \
+            --disable-static                  \
+            --docdir=/usr/share/doc/xz-5.4.5
+
+# Compile Xz-5.4.5 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Remove the libtool archive file because it is harmful for cross compilation:
+rm -v $LFS/usr/lib/liblzma.la
+
+# Clean up
+cd ..
+rm -r xz-5.4.4
