@@ -1,0 +1,35 @@
+#!/bin/bash
+# Binutils-2.41 Pass 2
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf binutils-2.41.tar.xz 
+cd binutils-2.41
+
+# Binutils building system relies on an shipped libtool copy to link against internal static libraries, but the libiberty and zlib copies shipped in the package do not use libtool. This inconsistency may cause produced binaries mistakenly linked against libraries from the host distro. Work around this issue:
+sed '6009s/$add_dir//' -i ltmain.sh
+
+
+
+# Create a separate build directory again:
+mkdir -v build
+cd       build
+
+# Configure the makefile
+../configure                   \
+    --prefix=/usr              \
+    --build=$(../config.guess) \
+    --host=$LFS_TGT            \
+    --disable-nls              \
+    --enable-shared            \
+    --enable-gprofng=no        \
+    --disable-werror           \
+    --enable-64-bit-bfd
+
+# Compile Binutils-2.41 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Remove the libtool archive files because they are harmful for cross compilation, and remove unnecessary static libraries:
+rm -v $LFS/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.{a,la}
