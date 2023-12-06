@@ -1,0 +1,21 @@
+#!/bin/bash
+# Tar-1.35
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf tar-1.35.tar.xz
+cd tar-1.35
+
+# Configure the makefile
+./configure --prefix=/usr                     \
+            --host=$LFS_TGT                   \
+            --build=$(build-aux/config.guess)
+
+# Compile Tar-1.35 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r tar-1.35
