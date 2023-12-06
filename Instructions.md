@@ -280,6 +280,7 @@ cp -rv usr/include $LFS/usr
 
 Clean up
 ```
+cd ..
 rm -r linux-6.5.1
 ```
 
