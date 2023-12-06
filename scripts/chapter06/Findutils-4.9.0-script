@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf findutils-4.9.0.tar.xz
+cd findutils-4.9.0
+
+# Configure the makefile
+./configure --prefix=/usr                   \
+            --localstatedir=/var/lib/locate \
+            --host=$LFS_TGT                 \
+            --build=$(build-aux/config.guess)
+
+# Compile Findutils-4.9.0 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r findutils-4.9.0
