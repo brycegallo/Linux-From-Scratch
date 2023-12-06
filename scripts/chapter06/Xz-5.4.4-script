@@ -10,7 +10,7 @@ cd xz-5.4.4
             --host=$LFS_TGT                   \
             --build=$(build-aux/config.guess) \
             --disable-static                  \
-            --docdir=/usr/share/doc/xz-5.4.5
+            --docdir=/usr/share/doc/xz-5.4.4
 
 # Compile Xz-5.4.5 and time the operation
 time make
