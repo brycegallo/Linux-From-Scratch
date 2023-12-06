@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf gawk-5.2.2.tar.xz
+cd gawk-5.2.2
+
+# Ensure some unneeded files are not installed:
+sed -i 's/extras//' Makefile.in
+
+# Configure the makefile
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+# Compile Gawk-5.2.2 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r gawk-5.2.2
