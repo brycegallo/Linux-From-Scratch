@@ -575,3 +575,48 @@ Clean up
 cd ..
 rm -r Diffutils-3.10
 ```
+
+### File-5.45 
+Extract the tar file, cd into the directory created in extraction
+```
+tar -xvf file-5.45.tar.gz
+cd file-5.45
+```
+
+Make a temporary copy of the file command
+```
+mkdir build
+pushd build
+  ../configure --disable-bzlib      \
+               --disable-libseccomp \
+               --disable-xzlib      \
+               --disable-zlib
+  make
+popd
+```
+
+Configure the makefile
+```
+./configure --prefix=/usr --host=$LFS_TGT --build=$(./config.guess)
+```
+
+Compile File-5.45 and time the operation
+```
+time make FILE_COMPILE=$(pwd)/build/src/file
+```
+
+Install the package
+```
+make DESTDIR=$LFS install
+```
+
+Remove the libtool archive file because it is harmful for cross compilation:
+```
+rm -v $LFS/usr/lib/libmagic.la
+```
+
+Clean up
+```
+cd ..
+rm -r file-5.45
+```
