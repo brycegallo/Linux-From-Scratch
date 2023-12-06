@@ -33,3 +33,7 @@ make DESTDIR=$LFS install
 
 # Remove the libtool archive files because they are harmful for cross compilation, and remove unnecessary static libraries:
 rm -v $LFS/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.{a,la}
+
+# Clean up
+cd ..
+rm -r binutils-2.41

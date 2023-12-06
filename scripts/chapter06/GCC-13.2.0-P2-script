@@ -1,0 +1,61 @@
+#!/bin/bash
+# GCC-13.2.0 Pass 2
+
+# Extract the tar file,
+tar -xvf gcc-13.2.0.tar.xz
+cd gcc-13.2.0
+
+# As in the first build of GCC, the GMP, MPFR, and MPC packages are required. Unpack the tarballs and move them into the required directories: 
+tar -xf ../mpfr-4.2.1.tar.xz
+mv -v mpfr-4.2.1 mpfr
+tar -xf ../gmp-6.3.0.tar.xz
+mv -v gmp-6.3.0 gmp
+tar -xf ../mpc-1.3.1.tar.gz
+mv -v mpc-1.3.1 mpc
+
+# On ARM64 hosts, set the default directory name for 64-bit libraries to “lib”:
+sed -e '/lp64=/s/lib64/lib/' \
+    -i.orig gcc/config/aarch64/t-aarch64-linux
+
+# Override the building rule of libgcc and libstdc++ headers, to allow building these libraries with POSIX threads support:
+sed '/thread_header =/s/@.*@/gthr-posix.h/' \
+    -i libgcc/Makefile.in libstdc++-v3/include/Makefile.in
+
+# Create a separate build directory again:
+mkdir -v build
+cd       build
+
+# Before starting to build GCC, remember to unset any environment variables that override the default optimization flags.
+
+# Configure the makefile
+../configure                                       \
+    --build=$(../config.guess)                     \
+    --host=$LFS_TGT                                \
+    --target=$LFS_TGT                              \
+    LDFLAGS_FOR_TARGET=-L$PWD/$LFS_TGT/libgcc      \
+    --prefix=/usr                                  \
+    --with-build-sysroot=$LFS                      \
+    --enable-default-pie                           \
+    --enable-default-ssp                           \
+    --disable-nls                                  \
+    --disable-multilib                             \
+    --disable-libatomic                            \
+    --disable-libgomp                              \
+    --disable-libquadmath                          \
+    --disable-libsanitizer                         \
+    --disable-libssp                               \
+    --disable-libvtv                               \
+    --enable-languages=c,c++
+
+# Compile GCC-13.2.0 and time the operation
+time make
+
+# Install the package:
+make DESTDIR=$LFS install
+
+# Create a utility symlink. Running cc leaves the system administrator free to decide which C compiler to install:
+ln -sv gcc $LFS/usr/bin/cc
+
+# Clean up
+cd ..
+rm -r gcc-13.2.0
