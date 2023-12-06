@@ -1,0 +1,21 @@
+#!/bin/bash
+# Diffutils-3.10
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf diffutils-3.10.tar.xz
+cd diffutils-3.10
+
+# Configure the makefile
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(./build-aux/config.guess)
+
+# Compile Diffutils-3.10 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r Diffutils-3.10
