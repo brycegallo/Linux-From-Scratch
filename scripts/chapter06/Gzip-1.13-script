@@ -1,0 +1,19 @@
+#!/bin/bash
+# Gzip-1.13
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf gzip-1.13.tar.xz
+cd gzip-1.13
+
+# Configure the makefile
+./configure --prefix=/usr --host=$LFS_TGT
+
+# Compile Gzip-1.13 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r gzip-1.13
