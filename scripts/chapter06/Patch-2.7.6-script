@@ -1,0 +1,21 @@
+#!/bin/bash
+# Patch-2.7.6
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf patch-2.7.6.tar.xz
+cd patch-2.7.6
+
+# Configure the makefile
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+# Compile Patch-2.7.6 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r patch-2.7.6
