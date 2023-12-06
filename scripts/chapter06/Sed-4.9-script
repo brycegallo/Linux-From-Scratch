@@ -1,0 +1,21 @@
+#!/bin/bash
+# Sed-4.9
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf sed-4.9.tar.xz
+cd sed-4.9
+
+# Configure the makefile
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(./build-aux/config.guess)
+
+# Compile Sed-4.9 and time the operation
+time make
+
+# Install the package
+make DESTDIR=$LFS install
+
+# Clean up
+cd ..
+rm -r sed-4.9
