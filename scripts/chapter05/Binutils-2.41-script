@@ -1,0 +1,26 @@
+#!/bin/bash
+# Binutils-2.41
+
+# Extract the tar file and then work inside the directories as instructed
+tar -xvf binutils-2.41.tar.xz
+cd binutils-2.41
+mkdir -v build
+cd build
+
+# Configure makefile
+../configure --prefix=$LFS/tools \
+             --with-sysroot=$LFS \
+             --target=$LFS_TGT   \
+             --disable-nls       \
+             --enable-gprofng=no \
+             --disable-werror
+
+# time to make and install can be considered 1 SBU
+time { make && make install; }
+
+# After building, optionally check the output of the make process.
+make -k check
+
+# Clean up
+cd $LFS/sources/
+rm -r binutils-2.41

@@ -159,7 +159,7 @@ Ensure all packages and patches are in the directory ```/mnt/lfs/sources/```
 4. ```cd``` back to the sources directory after building
 5. Delete the original, un-extracted file unless instructed otherwise
 
-### GNU Binutils
+### GNU Binutils 2.41
 Extract the tar file and then work inside the directories as instructed
 ```
 tar -xvf binutils-2.41.tar.xz
