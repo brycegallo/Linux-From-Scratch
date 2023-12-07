@@ -1,0 +1,53 @@
+#!/bin/bash
+# remove currently installed documentation files to prevent them from ending up in the final system
+rm -rf /usr/share/{info,man,doc}/*
+
+# Remove potentially dangerous libtool .la files unused by LFS systems
+find /usr/{lib,libexec} -name \*.la -delete
+
+# remove the tools directory which is no longer needed
+rm -rf /tools
+
+# ---- START Creating a backup (Optional) ----
+#
+# exit the chroot environment
+exit
+# Before making a backup, unmount the virtual file systems:
+mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
+umount $LFS/dev/pts
+umount $LFS/{sys,proc,run,dev}
+
+# Create the backup archive (may take over 10 minutes)
+cd $LFS
+tar -cJpf $HOME/lfs-temp-tools-arm64-r12.0-198.tar.xz .
+
+# Commands to Restore the file system
+# Extremely Dangerous
+# cd $LFS
+# rm -rf ./*
+# tar -xpf $HOME/lfs-temp-tools-arm64-r12.0-198.tar.xz
+
+# Commands to re-mount
+# honestly not sure if all of these should be entered
+# mount -v --bind /dev $LFS/dev
+# mount -v --bind /dev/pts $LFS/dev/pts
+# mount -vt proc proc $LFS/proc
+# mount -vt sysfs sysfs $LFS/sys
+# mount -vt tmpfs tmpfs $LFS/run
+# if [ -h $LFS/dev/shm ]; then
+#   (cd $LFS/dev; mkdir $(readlink shm))
+# else
+#   mount -vt tmpfs -o nosuid,nodev tmpfs $LFS/dev/shm
+# fi
+
+# Commands to re-enter chroot
+# chroot "$LFS" /usr/bin/env -i   \
+#     HOME=/root                  \
+#     TERM="$TERM"                \
+#     PS1='(lfs chroot) \u:\w\$ ' \
+#     PATH=/usr/bin:/usr/sbin     \
+#     MAKEFLAGS="-j$(nproc)"      \
+#     TESTSUITEFLAGS="-j$(nproc)" \
+#     /bin/bash --login
+
+# ---- FINISH Creating a backup (Optional) ----
