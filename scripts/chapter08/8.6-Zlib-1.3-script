@@ -1,0 +1,25 @@
+#!/bin/bash
+# Zlib-1.3
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf zlib-1.3.tar.gz
+cd zlib-1.3
+
+# Configure the makefile
+./configure --prefix=/usr
+
+# Compile Zlib-1.3 and time the operation
+time make
+
+# Checking this is critical
+make check
+
+# Install the package:
+make install
+
+# Remove a useless static library:
+rm -fv /usr/lib/libz.a
+
+# Clean up
+cd ..
+rm -r zlib-1.3
