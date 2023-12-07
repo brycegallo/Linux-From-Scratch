@@ -1,0 +1,21 @@
+#!/bin/bash
+# Python-3.11.5
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf Python-3.11.5.tar.xz
+cd Python-3.11.5
+
+# Configure the makefile
+./configure --prefix=/usr   \
+            --enable-shared \
+            --without-ensurepip
+
+# Compile Python-3.11.5 and time the operation
+time make
+
+# Install the package
+make install
+
+# Clean up
+cd ..
+rm -r Python-3.11.5
