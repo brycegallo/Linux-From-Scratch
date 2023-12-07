@@ -1,0 +1,22 @@
+#!/bin/bash
+# File-5.45
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf file-5.45.tar.gz
+cd file-5.45
+
+# Configure the makefile
+./configure --prefix=/usr
+
+# Compile File-5.45 and time the operation
+time make
+
+# Checking this is important
+make check
+
+# Install the package:
+make install
+
+# Clean up
+cd ..
+rm -r file-5.45
