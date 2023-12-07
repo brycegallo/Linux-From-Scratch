@@ -1,0 +1,42 @@
+#!/bin/bash
+# Bzip2-1.0.8
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf bzip2-1.0.8.tar.gz
+cd bzip2-1.0.8
+
+# Apply a patch that will install the documentation for this package:
+patch -Np1 -i ../bzip2-1.0.8-install_docs-1.patch
+
+# The following command ensures installation of symbolic links are relative:
+sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
+
+# Ensure the man pages are installed into the correct location:
+sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
+
+# Configure the makefile
+make -f Makefile-libbz2_so
+make clean
+
+# Compile Bzip2-1.0.8 and time the operation
+time make
+
+# Install the programs:
+make PREFIX=/usr install
+
+# Install the shared library:
+cp -av libbz2.so.* /usr/lib
+ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so
+
+# Install the shared bzip2 binary into the /usr/bin directory, and replace two copies of bzip2 with symlinks:
+cp -v bzip2-shared /usr/bin/bzip2
+for i in /usr/bin/{bzcat,bunzip2}; do
+  ln -sfv bzip2 $i
+done
+
+# Remove a useless static library:
+rm -fv /usr/lib/libbz2.a
+
+# Clean up
+cd ..
+rm -r bzip2-1.0.8
