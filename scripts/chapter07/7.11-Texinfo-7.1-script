@@ -1,0 +1,19 @@
+#!/bin/bash
+# Texinfo-7.1
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf texinfo-7.0.3.tar.xz
+cd texinfo-7.0.3
+
+# Configure the makefile
+./configure --prefix=/usr
+
+# Compile Texinfo-7.1 and time the operation
+time make
+
+# Install the package
+make install
+
+# Clean up
+cd ..
+rm -r texinfo-7.0.3
