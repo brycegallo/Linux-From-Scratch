@@ -1,0 +1,20 @@
+#!/bin/bash
+# Bison-3.8.2
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf bison-3.8.2.tar.xz
+cd bison-3.8.2
+
+# Configure the makefile
+./configure --prefix=/usr \
+            --docdir=/usr/share/doc/bison-3.8.2
+
+# Compile  Bison-3.8.2  and time the operation
+time make
+
+# Install the package
+make install
+
+# Clean up
+cd ..
+rm -r bison-3.8.2
