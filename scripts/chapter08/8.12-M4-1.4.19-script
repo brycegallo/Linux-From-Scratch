@@ -1,0 +1,22 @@
+#!/bin/bash
+# M4-1.4.19
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf m4-1.4.19.tar.xz
+cd m4-1.4.19
+
+# Configure the makefile
+./configure --prefix=/usr
+
+# Compile M4-1.4.19 and time the operation
+time make
+
+# Checking this is important
+make check
+
+# Install the package:
+make install
+
+# Clean up
+cd ..
+rm -r m4-1.4.19
