@@ -1,0 +1,28 @@
+#!/bin/bash
+# Flex-2.6.4
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf flex-2.6.4.tar.gz
+cd flex-2.6.4
+
+# Configure the makefile
+./configure --prefix=/usr \
+            --docdir=/usr/share/doc/flex-2.6.4 \
+            --disable-static
+
+# Compile Flex-2.6.4 and time the operation
+time make
+
+# Checking this is important
+make check
+
+# Install the package:
+make install
+
+# A few programs do not know about flex yet and try to run its predecessor, lex. To support those programs, create a symbolic link named lex that runs flex in lex emulation mode, and also create the man page of lex as a symlink:
+ln -sv flex   /usr/bin/lex
+ln -sv flex.1 /usr/share/man/man1/lex.1
+
+# Clean up
+cd ..
+rm -r flex-2.6.4
