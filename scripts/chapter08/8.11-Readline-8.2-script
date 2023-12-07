@@ -1,0 +1,35 @@
+#!/bin/bash
+# Readline-8.2 
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf readline-8.2.tar.gz
+cd readline-8.2
+
+# Reinstalling Readline will cause the old libraries to be moved to <libraryname>.old. While this is normally not a problem, in some cases it can trigger a linking bug in ldconfig. This can be avoided by issuing the following two seds:
+sed -i '/MV.*old/d' Makefile.in
+sed -i '/{OLDSUFF}/c:' support/shlib-install
+
+# Fix a problem identified upstream:
+# should be patch 2 but i must have downloaded the wrong one
+patch -Np1 -i ../readline-8.2-upstream_fix-1.patch
+
+# Configure the makefile
+./configure --prefix=/usr    \
+            --disable-static \
+            --with-curses    \
+            --docdir=/usr/share/doc/readline-8.2
+
+# Compile Readline-8.2 and time the operation
+time make SHLIB_LIBS="-lncursesw"
+
+# This package does not come with a test suite. 
+
+# Install the package:
+make SHLIB_LIBS="-lncursesw" install
+
+# If desired, install the documentation:
+install -v -m644 doc/*.{ps,pdf,html,dvi} /usr/share/doc/readline-8.2
+
+# Clean up
+cd ..
+rm -r readline-8.2
