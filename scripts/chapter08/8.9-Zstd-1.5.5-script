@@ -1,0 +1,22 @@
+#!/bin/bash
+# Zstd-1.5.5
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf zstd-1.5.5.tar.gz
+cd zstd-1.5.5
+
+# Compile zstd-1.5.5 and time the operation
+make prefix=/usr
+
+# Checking this is important
+make check
+
+# Install the package:
+make prefix=/usr install
+
+# Remove the static library:
+rm -v /usr/lib/libzstd.a
+
+# Clean up
+cd ..
+rm -r zstd-1.5.5
