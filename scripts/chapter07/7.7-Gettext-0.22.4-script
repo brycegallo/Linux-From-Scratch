@@ -8,7 +8,7 @@ cd gettext-0.22
 # Configure the makefile
 ./configure --disable-shared
 
-# Compile  Gettext-0.22.4  and time the operation
+# Compile Gettext-0.22.4 and time the operation
 time make
 
 # Install the msgfmt, msgmerge, and xgettext programs:

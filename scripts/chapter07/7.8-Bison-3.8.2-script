@@ -9,7 +9,7 @@ cd bison-3.8.2
 ./configure --prefix=/usr \
             --docdir=/usr/share/doc/bison-3.8.2
 
-# Compile  Bison-3.8.2  and time the operation
+# Compile Bison-3.8.2 and time the operation
 time make
 
 # Install the package
