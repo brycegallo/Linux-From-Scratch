@@ -1,0 +1,13 @@
+#!/bin/bash
+# Iana-Etc-20230810
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf iana-etc-20230810.tar.gz
+cd iana-etc-20230810
+
+# For this package, we only need to copy the files into place:
+cp services protocols /etc
+
+# Clean up
+cd ..
+rm -r iana-etc-20230810

@@ -8,7 +8,7 @@ cd man-pages-6.05.01
 # Remove two man pages for password hashing functions. Libxcrypt will provide a better version of these man pages:
 rm -v man3/crypt*
 
-# Install Man-pages by running:
+# Install Man-pages-6.05.01 by running:
 make prefix=/usr install
 
 # Clean up
