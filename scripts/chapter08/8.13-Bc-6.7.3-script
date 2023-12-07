@@ -1,0 +1,22 @@
+#!/bin/bash
+# Bc-6.7.3
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf bc-6.6.0.tar.xz
+cd bc-6.6.0
+
+# Configure the makefile
+CC=gcc ./configure --prefix=/usr -G -O3 -r
+
+# Compile Bc-6.7.3 and time the operation
+time make
+
+# Checking this is important
+make test
+
+# Install the package:
+make install
+
+# Clean up
+cd ..
+rm -r 
