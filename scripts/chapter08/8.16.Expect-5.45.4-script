@@ -1,0 +1,27 @@
+#!/bin/bash
+# Expect-5.45.4
+
+# Extract tar and cd
+tar -xvf expect-5.45.4.tar.xz
+cd expect-5.45.4
+
+# Update two config scripts to allow building this package for AArch64:
+
+tar -C tclconfig -xf ../autoconf-2.71.tar.xz --strip-components=2 \
+    autoconf-2.71/build-aux/config.{guess,sub}
+
+# Configure the makefile
+./configure --prefix=/usr           \
+            --with-tcl=/usr/lib     \
+            --enable-shared         \
+            --mandir=/usr/share/man \
+            --with-tclinclude=/usr/include
+
+time make
+make test
+make install
+ln -svf expect5.45.4/libexpect5.45.4.so /usr/lib
+
+# Clean up
+cd ..
+rm -r expect-5.45.4
