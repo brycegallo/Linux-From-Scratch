@@ -1,0 +1,28 @@
+#!/bin/bash
+# Pkgconf-2.0.3
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf pkgconf-2.0.3.tar.xz 
+cd pkgconf-2.0.3
+
+# Fix a regression in pkgconf-2.0.3 breaking BLFS packages:
+sed -i 's/str\(cmp.*package\)/strn\1, strlen(pkg->why)/' cli/main.c
+
+# Configure the makefile
+./configure --prefix=/usr              \
+            --disable-static           \
+            --docdir=/usr/share/doc/pkgconf-2.0.3
+
+# Compile Pkgconf-2.0.3 and time the operation
+time make
+
+# Install the package:
+make install
+
+# To maintain compatibility with the original Pkg-config create two symlinks:
+ln -sv pkgconf   /usr/bin/pkg-config
+ln -sv pkgconf.1 /usr/share/man/man1/pkg-config.1
+
+# Clean up
+cd ..
+rm -r pkgconf-2.0.3
