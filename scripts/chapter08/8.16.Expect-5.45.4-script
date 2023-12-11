@@ -1,12 +1,11 @@
 #!/bin/bash
 # Expect-5.45.4
 
-# Extract tar and cd
+# Extract the tar file, cd into the directory created in extraction
 tar -xvf expect-5.45.4.tar.xz
 cd expect-5.45.4
 
 # Update two config scripts to allow building this package for AArch64:
-
 tar -C tclconfig -xf ../autoconf-2.71.tar.xz --strip-components=2 \
     autoconf-2.71/build-aux/config.{guess,sub}
 
@@ -17,8 +16,13 @@ tar -C tclconfig -xf ../autoconf-2.71.tar.xz --strip-components=2 \
             --mandir=/usr/share/man \
             --with-tclinclude=/usr/include
 
+# Compile Expect-5.45.4 and time the operation
 time make
+
+# Checking this is important
 make test
+
+# Install the package:
 make install
 ln -svf expect5.45.4/libexpect5.45.4.so /usr/lib
 
