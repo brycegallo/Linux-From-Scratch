@@ -1,0 +1,23 @@
+#!/bin/bash
+# Acl-2.3.1
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf acl-2.3.1.tar.xz
+cd acl-2.3.1
+
+# Configure the makefile
+./configure --prefix=/usr         \
+            --disable-static      \
+            --docdir=/usr/share/doc/acl-2.3.1
+
+# Compile Acl-2.3.1 and time the operation
+time make
+
+# The Acl tests must be run on a filesystem that supports access controls, but not until the Coreutils package has been built, using the Acl libraries. If desired, return to this package and run make check after the Coreutils package has been built.
+
+# Install the package:
+make install
+
+# Clean up
+cd ..
+rm -r acl-2.3.1
