@@ -1,0 +1,28 @@
+#!/bin/bash
+# MPC-1.3.1
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf mpc-1.3.1.tar.gz
+cd mpc-1.3.1
+
+# Configure the makefile
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/mpc-1.3.1
+
+# Compile MPC-1.3.1 and time the operation
+time make
+
+# Generate the HTML documentation:
+make html
+
+# Testing this is important
+make check
+
+# Install the package and its documentation:
+make install
+make install-html
+
+# Clean up
+cd ..
+rm -r mpc-1.3.1
