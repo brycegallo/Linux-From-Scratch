@@ -1,0 +1,29 @@
+#!/bin/bash
+# MPFR-4.2.1
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf mpfr-4.2.1.tar.xz
+cd mpfr-4.2.1
+
+# Configure the makefile
+./configure --prefix=/usr        \
+            --disable-static     \
+            --enable-thread-safe \
+            --docdir=/usr/share/doc/mpfr-4.2.1
+
+# Compile MPFR-4.2.1 and time the operation
+time make
+
+# Generate the HTML documentation:
+make html
+
+# Test the results and ensure that all 198 tests passed:
+make check
+
+#Install the package and its documentation:
+make install
+make install-html
+
+# Clean up
+cd ..
+rm -r mpfr-4.2.1

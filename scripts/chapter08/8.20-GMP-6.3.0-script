@@ -11,10 +11,10 @@ cd gmp-6.3.0
             --disable-static \
             --docdir=/usr/share/doc/gmp-6.3.0
 
-# Compile Binutils-2.41 and time the operation
+# Compile GMP-6.3.0 and time the operation
 time make
 
-# Generate the html documentation
+# Generate the HTML documentation
 make html
 
 # Testing this is critical
