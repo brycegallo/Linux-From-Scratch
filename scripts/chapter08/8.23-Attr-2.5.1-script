@@ -1,0 +1,25 @@
+#!/bin/bash
+# Attr-2.5.1 
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf attr-2.5.1.tar.gz
+cd attr-2.5.1
+
+# Configure the makefile
+./configure --prefix=/usr     \
+            --disable-static  \
+            --sysconfdir=/etc \
+            --docdir=/usr/share/doc/attr-2.5.1
+
+# Compile Attr-2.5.1 and time the operation
+time make
+
+# The tests must be run on a filesystem that supports extended attributes such as the ext2, ext3, or ext4 filesystems. To test the results, run:
+make check
+
+# Install the package:
+make install
+
+# Clean up
+cd ..
+rm -r attr-2.5.1
