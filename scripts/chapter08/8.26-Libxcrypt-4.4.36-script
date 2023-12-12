@@ -1,0 +1,26 @@
+#!/bin/bash
+# Libxcrypt-4.4.36
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf libxcrypt-4.4.36.tar.xz
+cd libxcrypt-4.4.36
+
+# Configure the makefile
+./configure --prefix=/usr                \
+            --enable-hashes=strong,glibc \
+            --enable-obsolete-api=no     \
+            --disable-static             \
+            --disable-failure-tokens
+
+# Compile Libxcrypt-4.4.36 and time the operation
+time make
+
+# To test the results, issue:
+make check
+
+# Install the package:
+make install
+
+# Clean up
+cd ..
+rm -r libxcrypt-4.4.36
