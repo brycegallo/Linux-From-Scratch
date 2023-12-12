@@ -37,5 +37,5 @@ make tooldir=/usr install
 rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
 
 # Clean up
-cd ..
+cd ../..
 rm -r binutils-2.41

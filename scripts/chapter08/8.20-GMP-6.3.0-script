@@ -1,0 +1,32 @@
+#!/bin/bash
+# GMP-6.3.0
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf gmp-6.3.0.tar.xz 
+cd gmp-6.3.0
+
+# Configure the makefile
+./configure --prefix=/usr    \
+            --enable-cxx     \
+            --disable-static \
+            --docdir=/usr/share/doc/gmp-6.3.0
+
+# Compile Binutils-2.41 and time the operation
+time make
+
+# Generate the html documentation
+make html
+
+# Testing this is critical
+make check 2>&1 | tee gmp-check-log
+
+# Ensure that at least 199 tests in the test suite passed. Check the results by issuing the following command:
+awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log
+
+# Install the package and its documentation:
+time make install
+make install-html
+
+# Clean up
+cd ..
+rm -r gmp-6.3.0
