@@ -1,0 +1,41 @@
+#!/bin/bash
+# Binutils-2.41
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf binutils-2.41.tar.xz
+cd binutils-2.41
+
+# The Binutils documentation recommends building Binutils in a dedicated build directory:
+mkdir -v build
+cd       build
+
+# Configure the makefile
+../configure --prefix=/usr       \
+             --sysconfdir=/etc   \
+             --enable-gold       \
+             --enable-ld=default \
+             --enable-plugins    \
+             --enable-shared     \
+             --disable-werror    \
+             --enable-64-bit-bfd \
+             --with-system-zlib
+
+# Compile Binutils-2.41 and time the operation
+make tooldir=/usr
+
+# Testing this is critical
+make -k check
+
+# For a list of failed tests, run:
+grep '^FAIL:' $(find -name '*.log')
+# Three tests in the gprofng suite are known to fail.
+
+# Install the package:
+make tooldir=/usr install
+
+# Remove useless static libraries:
+rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
+
+# Clean up
+cd ..
+rm -r binutils-2.41
