@@ -1,0 +1,22 @@
+#!/bin/bash
+# Libcap-2.69 
+
+# Extract the tar file, cd into the directory created in extraction
+tar -xvf libcap-2.69.tar.xz 
+cd libcap-2.69
+
+# Prevent static libraries from being installed:
+sed -i '/install -m.*STA/d' libcap/Makefile
+
+# Compile Libcap-2.69 and time the operation
+make prefix=/usr lib=lib
+
+# To test the results, issue:
+make test
+
+# Install the package:
+make prefix=/usr lib=lib install
+
+# Clean up
+cd ..
+rm -r libcap-2.69
